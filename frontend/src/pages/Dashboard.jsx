@@ -91,15 +91,45 @@ export default function Dashboard() {
             <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-200">📈 Usage History</h3>
           </div>
           <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={history}>
-              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-              <XAxis dataKey="date" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" />
-              <Tooltip contentStyle={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', border: 'none', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }} />
-              <Line type="monotone" dataKey="unitsConsumed" stroke="#3b82f6" strokeWidth={3} dot={{ r: 4 }} name="Units" activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }} />
-              <Line type="monotone" dataKey="billAmount" stroke="#22c55e" strokeWidth={3} dot={{ r: 4 }} name="Bill" activeDot={{ r: 8, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }} />
-            </LineChart>
-          </ResponsiveContainer>
+  {history && history.length > 0 ? (
+    <LineChart data={history}>
+      <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+      <XAxis dataKey="date" stroke="#6b7280" />
+      <YAxis stroke="#6b7280" />
+      <Tooltip
+        contentStyle={{
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          border: 'none',
+          borderRadius: '12px',
+          boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+        }}
+      />
+      <Line
+        type="monotone"
+        dataKey="unitsConsumed"
+        stroke="#3b82f6"
+        strokeWidth={3}
+        dot={{ r: 4 }}
+        name="Units"
+        activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+      />
+      <Line
+        type="monotone"
+        dataKey="billAmount"
+        stroke="#22c55e"
+        strokeWidth={3}
+        dot={{ r: 4 }}
+        name="Bill"
+        activeDot={{ r: 8, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
+      />
+    </LineChart>
+  ) : (
+    <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400 text-lg">
+      ℹ️ No usage data yet. Enter your first units!
+    </div>
+  )}
+</ResponsiveContainer>
+
         </motion.div>
 
         {/* Top Section */}
@@ -161,3 +191,4 @@ export default function Dashboard() {
     </div>
   );
 }
+
