@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHistory, fetchRewards, submitUnits } from "../store";
 
@@ -19,9 +19,12 @@ import { Zap, TrendingUp, Award, BarChart3, Plus } from "lucide-react";
 import CountUp from "react-countup";
 import { motion } from "framer-motion";
 
+import { AuthContext } from "../context/AuthContext";
+
 export default function Dashboard() {
   const dispatch = useDispatch();
   const { history, rewards } = useSelector((state) => state.energy);
+  const { email } = useContext(AuthContext);
 
   const [units, setUnits] = useState("");
   const [msg, setMsg] = useState("");
@@ -30,8 +33,6 @@ export default function Dashboard() {
   const [totalUnits, setTotalUnits] = useState(0);
   const [totalBill, setTotalBill] = useState(0);
 
-  const email = localStorage.getItem("email");
-
   // 🔹 Fetch history & rewards
   useEffect(() => {
     dispatch(fetchHistory());
@@ -39,45 +40,47 @@ export default function Dashboard() {
   }, [dispatch]);
 
   // 🔮 Predict next month bill & calculate totals
-useEffect(() => {
-  if (!history || history.length === 0) {
-    setPredictedBill(0);
-    setTotalUnits(0);
-    setTotalBill(0);
-    return;
-  }
+  useEffect(() => {
+    if (!history || history.length === 0) {
+      setPredictedBill(0);
+      setTotalUnits(0);
+      setTotalBill(0);
+      return;
+    }
 
-  const totalU = history.reduce((sum, h) => sum + Number(h.unitsConsumed), 0);
-  const totalB = history.reduce((sum, h) => sum + Number(h.billAmount), 0);
-  setTotalUnits(totalU);
-  setTotalBill(totalB);
+    const totalU = history.reduce((sum, h) => sum + Number(h.unitsConsumed), 0);
+    const totalB = history.reduce((sum, h) => sum + Number(h.billAmount), 0);
+    setTotalUnits(totalU);
+    setTotalBill(totalB);
 
-  if (history.length < 2) {
-    setPredictedBill(0);
-    return;
-  }
+    if (history.length < 2) {
+      setPredictedBill(0);
+      return;
+    }
 
-  const last = history[history.length - 1];
-  const previous = history[history.length - 2];
+    const last = history[history.length - 1];
+    const previous = history[history.length - 2];
 
-  const avgUnits =
-    (Number(last.unitsConsumed) + Number(previous.unitsConsumed)) / 2;
+    const avgUnits =
+      (Number(last.unitsConsumed) + Number(previous.unitsConsumed)) / 2;
 
-  const RATE_PER_UNIT = 4;
-
-  setPredictedBill(Math.round(avgUnits * RATE_PER_UNIT));
-}, [history]);
-
+    const RATE_PER_UNIT = 4;
+    setPredictedBill(Math.round(avgUnits * RATE_PER_UNIT));
+  }, [history]);
 
   // 🔹 Submit usage
   const submit = async (e) => {
     e.preventDefault();
 
-    await dispatch(submitUnits(units));
-
-    setMsg("✅ Units submitted successfully!");
-    setUnits("");
-    setAlertKey((prev) => prev + 1);
+    try {
+      await dispatch(submitUnits(units));
+      setMsg("✅ Units submitted successfully!");
+      setUnits("");
+      setAlertKey((prev) => prev + 1); // refresh alert component
+    } catch (err) {
+      setMsg("❌ Failed to submit units");
+      console.error(err);
+    }
   };
 
   return (
@@ -86,7 +89,7 @@ useEffect(() => {
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-20 left-20 w-64 h-64 bg-green-400 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-20 w-80 h-80 bg-blue-400 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-purple-400 rounded-full blur-2xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-purple-400 rounded-2xl blur-2xl"></div>
       </div>
 
       <div className="relative max-w-7xl mx-auto px-6 py-6 text-gray-900 dark:text-white">
@@ -95,7 +98,7 @@ useEffect(() => {
         <DailyTipBanner />
 
         {/* ⚠️ Energy Alert */}
-        <EnergyAlert email={email} refresh={alertKey} />
+        {email && <EnergyAlert refresh={alertKey} />}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -127,7 +130,7 @@ useEffect(() => {
           </div>
 
           <ResponsiveContainer width="100%" height={350}>
-            <LineChart data={history}>
+            <LineChart data={history || []}>
               <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
               <XAxis dataKey="date" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
@@ -146,8 +149,6 @@ useEffect(() => {
                 strokeWidth={3}
                 dot={{ r: 4 }}
                 name="Units"
-                animationDuration={1500}
-                animationEasing="ease-in-out"
                 activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
               />
               <Line
@@ -157,8 +158,6 @@ useEffect(() => {
                 strokeWidth={3}
                 dot={{ r: 4 }}
                 name="Bill"
-                animationDuration={1500}
-                animationEasing="ease-in-out"
                 activeDot={{ r: 8, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
               />
             </LineChart>
@@ -167,8 +166,7 @@ useEffect(() => {
 
         {/* ===== Top Section ===== */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-          {/* ===== Energy Input Card ===== */}
+          {/* Energy Input Card */}
           <form
             onSubmit={submit}
             className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 space-y-4"
@@ -222,7 +220,7 @@ useEffect(() => {
             )}
           </form>
 
-          {/* ===== Rewards Card ===== */}
+          {/* Rewards Card */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -250,7 +248,7 @@ useEffect(() => {
           </motion.div>
         </div>
 
-        {/* ===== Stats Section ===== */}
+        {/* Stats Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -287,7 +285,6 @@ useEffect(() => {
             <p className="text-sm text-gray-500 dark:text-gray-400">Next month</p>
           </div>
         </motion.div>
-
       </div>
     </div>
   );
