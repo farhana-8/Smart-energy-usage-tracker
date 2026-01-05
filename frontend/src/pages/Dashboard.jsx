@@ -24,6 +24,7 @@ export default function Dashboard() {
 
   const [units, setUnits] = useState("");
   const [msg, setMsg] = useState("");
+  const [alertKey, setAlertKey] = useState(0);
   const [predictedBill, setPredictedBill] = useState(0);
   const [totalUnits, setTotalUnits] = useState(0);
   const [totalBill, setTotalBill] = useState(0);
@@ -37,34 +38,35 @@ export default function Dashboard() {
   }, [dispatch]);
 
   // 🔮 Predict next month bill & calculate totals
-  useEffect(() => {
-    if (!history || history.length === 0) {
-      setPredictedBill(0);
-      setTotalUnits(0);
-      setTotalBill(0);
-      return;
-    }
+useEffect(() => {
+  if (!history || history.length === 0) {
+    setPredictedBill(0);
+    setTotalUnits(0);
+    setTotalBill(0);
+    return;
+  }
 
-    const totalU = history.reduce((sum, h) => sum + Number(h.unitsConsumed), 0);
-    const totalB = history.reduce((sum, h) => sum + Number(h.billAmount), 0);
-    setTotalUnits(totalU);
-    setTotalBill(totalB);
+  const totalU = history.reduce((sum, h) => sum + Number(h.unitsConsumed), 0);
+  const totalB = history.reduce((sum, h) => sum + Number(h.billAmount), 0);
+  setTotalUnits(totalU);
+  setTotalBill(totalB);
 
-    if (history.length < 2) {
-      setPredictedBill(0);
-      return;
-    }
+  if (history.length < 2) {
+    setPredictedBill(0);
+    return;
+  }
 
-    const last = history[history.length - 1];
-    const previous = history[history.length - 2];
+  const last = history[history.length - 1];
+  const previous = history[history.length - 2];
 
-    const avgUnits =
-      (Number(last.unitsConsumed) + Number(previous.unitsConsumed)) / 2;
+  const avgUnits =
+    (Number(last.unitsConsumed) + Number(previous.unitsConsumed)) / 2;
 
-    const RATE_PER_UNIT = 4;
+  const RATE_PER_UNIT = 4;
 
-    setPredictedBill(Math.round(avgUnits * RATE_PER_UNIT));
-  }, [history]);
+  setPredictedBill(Math.round(avgUnits * RATE_PER_UNIT));
+}, [history]);
+
 
   // 🔹 Submit usage
   const submit = async (e) => {
@@ -74,6 +76,7 @@ export default function Dashboard() {
 
     setMsg("✅ Units submitted successfully!");
     setUnits("");
+    setAlertKey((prev) => prev + 1);
   };
 
   return (
@@ -89,6 +92,9 @@ export default function Dashboard() {
 
         {/* 🌱 Daily Tip */}
         <DailyTipBanner />
+
+        {/* ⚠️ Energy Alert */}
+        <EnergyAlert email={email} refresh={alertKey} />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -120,43 +126,41 @@ export default function Dashboard() {
           </div>
 
           <ResponsiveContainer width="100%" height={350}>
-            {history && history.length > 0 ? (
-              <LineChart data={history}>
-                <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-                <XAxis dataKey="date" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                    border: 'none',
-                    borderRadius: '12px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="unitsConsumed"
-                  stroke="#3b82f6"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                  name="Units"
-                  activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="billAmount"
-                  stroke="#22c55e"
-                  strokeWidth={3}
-                  dot={{ r: 4 }}
-                  name="Bill"
-                  activeDot={{ r: 8, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
-                />
-              </LineChart>
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400 text-lg">
-                ℹ️ No usage data yet. Enter your first units!
-              </div>
-            )}
+            <LineChart data={history}>
+              <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+              <XAxis dataKey="date" stroke="#6b7280" />
+              <YAxis stroke="#6b7280" />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  border: 'none',
+                  borderRadius: '12px',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="unitsConsumed"
+                stroke="#3b82f6"
+                strokeWidth={3}
+                dot={{ r: 4 }}
+                name="Units"
+                animationDuration={1500}
+                animationEasing="ease-in-out"
+                activeDot={{ r: 8, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
+              />
+              <Line
+                type="monotone"
+                dataKey="billAmount"
+                stroke="#22c55e"
+                strokeWidth={3}
+                dot={{ r: 4 }}
+                name="Bill"
+                animationDuration={1500}
+                animationEasing="ease-in-out"
+                activeDot={{ r: 8, stroke: '#22c55e', strokeWidth: 2, fill: '#fff' }}
+              />
+            </LineChart>
           </ResponsiveContainer>
         </motion.div>
 
