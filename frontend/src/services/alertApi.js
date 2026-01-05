@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-});
+// src/services/alertService.js
+import api from "./authService"; // reuse the existing api instance with token
 
 export const fetchEnergyAlert = async (email) => {
-  const response = await api.get(`/alerts/${email}`);
+  const trimmedEmail = email.trim();
+  const response = await api.get(`/alerts/${trimmedEmail}`);
   return response.data;
 };
