@@ -1,6 +1,6 @@
 import { useEffect, useState, useContext } from "react";
 import { motion } from "framer-motion";
-import { fetchEnergyAlert } from "../services/alertService"; // uses authService api
+import { fetchEnergyAlert } from "../services/alertApi"; // uses authService api
 import { AuthContext } from "../context/AuthContext";
 
 const EnergyAlert = ({ refresh }) => {
@@ -53,3 +53,4 @@ const EnergyAlert = ({ refresh }) => {
 };
 
 export default EnergyAlert;
+
