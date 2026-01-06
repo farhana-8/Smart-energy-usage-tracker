@@ -228,7 +228,7 @@ useEffect(() => {
 
               /* Dark Mode Gradient, Stronger Glow & Border */
               dark:from-blue-950 dark:via-purple-950 dark:to-gray-950
-              dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.7)]
+              dark:shadow-[0_0_30px_-5px_rgba(139,92,246,0.6)]
               dark:border dark:border-white/10
             "
           >
@@ -290,3 +290,4 @@ useEffect(() => {
     </div>
   );
 }
+
