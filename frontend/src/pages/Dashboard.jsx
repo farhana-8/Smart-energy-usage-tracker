@@ -213,16 +213,23 @@ useEffect(() => {
             )}
           </form>
 
-          {/* ===== Rewards Card ===== */}
+          {/* ===== Rewards Card (UPDATED WITH GLOW) ===== */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.6, duration: 0.6 }}
             className="
-              rounded-2xl shadow-xl p-8 flex flex-col justify-center items-center
-              bg-gradient-to-br from-green-400 via-blue-500 to-purple-600
-              dark:from-gray-800 dark:via-gray-900 dark:to-gray-900
+              rounded-2xl p-8 flex flex-col justify-center items-center
               text-white relative overflow-hidden
+              
+              /* Light Mode Gradient & Glow */
+              bg-gradient-to-br from-green-400 via-blue-500 to-purple-600
+              shadow-[0_10px_40px_-10px_rgba(59,130,246,0.5)]
+
+              /* Dark Mode Gradient, Stronger Glow & Border */
+              dark:from-blue-950 dark:via-purple-950 dark:to-gray-950
+              dark:shadow-[0_0_50px_-10px_rgba(168,85,247,0.7)]
+              dark:border dark:border-white/10
             "
           >
             <div className="absolute inset-0 bg-white opacity-10 rounded-2xl"></div>
@@ -283,5 +290,3 @@ useEffect(() => {
     </div>
   );
 }
-
-
