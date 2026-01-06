@@ -17,7 +17,7 @@ export default function History() {
   const [predictedBill, setPredictedBill] = useState(null);
 
   // ✅ Backend base URL (LOCAL / AZURE both work)
-  const BASE_URL = import.meta.env.VITE_API_URL;
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   // 1️⃣ Fetch history
   useEffect(() => {
