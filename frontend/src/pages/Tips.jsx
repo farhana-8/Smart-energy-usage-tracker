@@ -10,8 +10,12 @@ export default function Tips() {
   useEffect(() => {
     fetchTips()
       .then(setTips)
+      .catch(() => setTips([])) // ✅ NEW LOGIC (safe)
       .finally(() => setLoading(false));
   }, []);
+
+  // ✅ NEW LOGIC (stable icons)
+  const icons = [Zap, Leaf, Lightbulb];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-orange-50 to-red-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors relative overflow-hidden">
@@ -69,40 +73,43 @@ export default function Tips() {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="grid md:grid-cols-3 gap-8"
           >
-            {tips.map((tip, i) => (
-              <motion.div
-                key={tip.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="
-                  bg-white dark:bg-gray-800
-                  rounded-2xl shadow-xl p-6
-                  hover:shadow-2xl transition-all duration-300
-                  transform hover:scale-105 hover:-translate-y-2
-                  border border-gray-100 dark:border-gray-700
-                  relative overflow-hidden
-                "
-              >
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
-                <div className="relative">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
-                      {i % 3 === 0 && <Zap size={24} />}
-                      {i % 3 === 1 && <Leaf size={24} />}
-                      {i % 3 === 2 && <Lightbulb size={24} />}
-                    </div>
-                    <h3 className="font-bold text-lg text-gray-800 dark:text-white">
-                      {tip.title}
-                    </h3>
-                  </div>
+            {tips.map((tip, i) => {
+              const Icon = icons[tip.id % icons.length]; // ✅ NEW LOGIC
 
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                    {tip.description}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+              return (
+                <motion.div
+                  key={tip.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.5 }}
+                  className="
+                    bg-white dark:bg-gray-800
+                    rounded-2xl shadow-xl p-6
+                    hover:shadow-2xl transition-all duration-300
+                    transform hover:scale-105 hover:-translate-y-2
+                    border border-gray-100 dark:border-gray-700
+                    relative overflow-hidden
+                  "
+                >
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full opacity-10 -mr-10 -mt-10"></div>
+
+                  <div className="relative">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="p-3 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
+                        <Icon size={24} />
+                      </div>
+                      <h3 className="font-bold text-lg text-gray-800 dark:text-white">
+                        {tip.title}
+                      </h3>
+                    </div>
+
+                    <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                      {tip.description}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
 
