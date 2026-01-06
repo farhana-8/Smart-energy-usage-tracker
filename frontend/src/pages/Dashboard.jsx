@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchHistory, fetchRewards, submitUnits } from "../store";
 
 import DailyTipBanner from "../components/DailyTipBanner";
-import EnergyAlert from "../components/EnergyAlert";
 
 import {
   LineChart,
@@ -25,12 +24,9 @@ export default function Dashboard() {
 
   const [units, setUnits] = useState("");
   const [msg, setMsg] = useState("");
-  const [alertKey, setAlertKey] = useState(0);
   const [predictedBill, setPredictedBill] = useState(0);
   const [totalUnits, setTotalUnits] = useState(0);
   const [totalBill, setTotalBill] = useState(0);
-
-  const email = localStorage.getItem("email");
 
   // 🔹 Fetch history & rewards
   useEffect(() => {
@@ -77,7 +73,6 @@ useEffect(() => {
 
     setMsg("✅ Units submitted successfully!");
     setUnits("");
-    setAlertKey((prev) => prev + 1);
   };
 
   return (
@@ -93,11 +88,6 @@ useEffect(() => {
 
         {/* 🌱 Daily Tip */}
         <DailyTipBanner />
-
-        {/* ⚠️ Energy Alert */}
-        <EnergyAlert refresh={alertKey} />
-
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -293,3 +283,4 @@ useEffect(() => {
     </div>
   );
 }
+
