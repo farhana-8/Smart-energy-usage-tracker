@@ -49,7 +49,7 @@ export default function Landing() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="flex flex-col sm:flex-row justify-center gap-6"
+          className="flex flex-col sm:flex-row justify-center gap-5"
         >
           <Link
             to="/login"
